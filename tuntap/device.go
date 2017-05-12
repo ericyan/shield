@@ -87,3 +87,44 @@ func (dev *Device) SetMTU(mtu int) error {
 
 	return netlink.LinkSetMTU(link, mtu)
 }
+
+// Addrs returns all IPv4 and IPv6 addresses assigned to the interface.
+func (dev *Device) Addrs() ([]*Addr, error) {
+	link, err := netlink.LinkByIndex(dev.Index)
+	if err != nil {
+		return nil, err
+	}
+	list, err := netlink.AddrList(link, netlink.FAMILY_ALL)
+	if err != nil {
+		return nil, err
+	}
+
+	addrs := make([]*Addr, len(list))
+	for i := range list {
+		a := Addr(list[i])
+		addrs[i] = &a
+	}
+	return addrs, nil
+}
+
+// AddAddr adds the specified IP address to the interface.
+func (dev *Device) AddAddr(addr *Addr) error {
+	link, err := netlink.LinkByIndex(dev.Index)
+	if err != nil {
+		return err
+	}
+
+	a := netlink.Addr(*addr)
+	return netlink.AddrAdd(link, &a)
+}
+
+// DelAddr removes the specified IP address from the interface.
+func (dev *Device) DelAddr(addr *Addr) error {
+	link, err := netlink.LinkByIndex(dev.Index)
+	if err != nil {
+		return err
+	}
+
+	a := netlink.Addr(*addr)
+	return netlink.AddrDel(link, &a)
+}
