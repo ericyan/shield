@@ -32,16 +32,7 @@ func New(local, remote string) (*Conn, error) {
 
 // Read reads data from the peer.
 func (c *Conn) Read(b []byte) (int, error) {
-	n, addr, err := c.ReadFromUDP(b)
-	if err != nil {
-		return n, err
-	}
-
-	// Discard packets not from the peer
-	if addr.String() != c.remoteAddr.String() {
-		return 0, nil
-	}
-
+	n, _, err := c.ReadFromUDP(b)
 	return n, err
 }
 
