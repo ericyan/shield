@@ -25,3 +25,15 @@ func TestStreamCipher(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkXORKeyStream(b *testing.B) {
+	plaintext := make([]byte, 1500)
+	ciphertext := make([]byte, len(plaintext))
+	c := NewCipher(new(fakePRNG))
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		c.XORKeyStream(ciphertext, plaintext)
+	}
+	b.SetBytes(int64(len(plaintext)))
+}
